@@ -1,0 +1,6 @@
+Cython==0.29.15
+numpy==1.16.6
+tensorboard==1.15.0
+tensorflow-estimator==1.15.1
+tensorflow-gpu==1.15.0
+tensorflow-tensorboard==1.5.1

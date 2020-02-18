@@ -1,3 +1,56 @@
+# VSEPP Web Service
+
+This is a fork of the [vsepp](https://github.com/fartashf/vsepp) project. Their original readme is below. 
+
+This project extends that code, and adds a memory resident webservice using [web.py](https://webpy.org).
+
+This depends on Python 2.7, PyTorch 1.2.1, and tensorflow-gpu 1.15.0 for Cuda10 
+
+To get the code and install dependencies:
+
+  git clone https://github.com/ascott02/vsepp.git 
+  cd vsepp
+  virtualenv --python=python2.7 ../venv
+  source ../venv/bin/activate
+  pip install -r requirements_build.txt # installs cython and numpy
+  pip install -r requirements.txt       # installs the rest
+
+To get the data and models (same as below):
+
+  wget -v http://www.cs.toronto.edu/~faghri/vsepp/vocab.tar 
+  wget -v http://www.cs.toronto.edu/~faghri/vsepp/data.tar 
+  wget -v http://www.cs.toronto.edu/~faghri/vsepp/runs.tar
+
+Extract those to somewhere you have a lot of space
+
+  mkdir /mnt/BIGSPACE/vsepp
+  cd /mnt/BIGSPACE/vsepp
+  tar -xvf vocab.tar
+  tar -xvf data.tar
+  tar -xvf runs.tar
+
+Symlink from your vsepp checkout dir to your unpacked dirs
+
+  cd ~/code/vsepp # or wherever you had checked it out
+  ln -s /mnt/BIGSOACE/vsepp/vocab 
+  ln -s /mnt/BIGSOACE/vsepp/data
+  ln -s /mnt/BIGSOACE/vsepp/runs
+
+Run the test_eval.py script to test it out
+  
+  cd ~/code/vsepp # or wherever you had checked it out
+  source ../venv/bin/activate
+  python test_eval.py
+
+Run the webservice
+
+  cd ~/code/vsepp # or wherever you had checked it out
+  source ../venv/bin/activate
+  cd webservice
+  python main.py [port]   # port is optional, defaults to 8080 
+
+Original README.md follows
+
 # Improving Visual-Semantic Embeddings with Hard Negatives
 
 Code for the image-caption retrieval methods from
