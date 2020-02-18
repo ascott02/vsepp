@@ -4,7 +4,7 @@ This is a fork of the [vsepp](https://github.com/fartashf/vsepp) project. Their 
 
 Depends on Python 2.7, PyTorch==1.4.0, and tensorflow-gpu==1.15.0 for Cuda 10 .
 
-To get the code and install dependencies:
+Get the code and install dependencies:
 
     git clone https://github.com/ascott02/vsepp.git 
     cd vsepp
@@ -18,7 +18,7 @@ Download the punkt dictionary
     source ../code/venv/bin/activate
     python -m nltk.downloader punkt
 
-To get the data and models (same as original README.md below):
+Get the data and models 
 
     wget -v http://www.cs.toronto.edu/~faghri/vsepp/vocab.tar 
     wget -v http://www.cs.toronto.edu/~faghri/vsepp/data.tar 
