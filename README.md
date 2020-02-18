@@ -1,6 +1,6 @@
 # VSEPP Web Service
 
-This is a fork of the [vsepp](https://github.com/fartashf/vsepp) project. Their original readme is below. This project extends that code, and adds a memory resident webservice using [web.py](https://webpy.org).
+This is a fork of the [vsepp](https://github.com/fartashf/vsepp) project. Their original README.me is below. This project extends that code, and adds a memory resident webservice using [web.py](https://webpy.org).
 
 Depends on Python 2.7, PyTorch==1.4.0, and tensorflow-gpu==1.15.0 for Cuda 10 .
 
@@ -18,7 +18,7 @@ Download the punkt dictionary
     source ../code/venv/bin/activate
     python -m nltk.downloader punkt
 
-To get the data and models (same as below):
+To get the data and models (same as original README.md below):
 
     wget -v http://www.cs.toronto.edu/~faghri/vsepp/vocab.tar 
     wget -v http://www.cs.toronto.edu/~faghri/vsepp/data.tar 
@@ -45,7 +45,7 @@ Run the test_eval.py script to test it out
     source ../venv/bin/activate
     python test_eval.py
 
-Run the webservice. *Note: Ask Andrew for the config.py file, otherwise this won't run.*
+Run the webservice. *Note: Ask Andrew for the config.py not in repo*
 
     cd ~/code/vsepp # or wherever you had checked it out
     source ../venv/bin/activate
