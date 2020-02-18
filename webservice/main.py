@@ -2,6 +2,7 @@ from __future__ import print_function
 
 # for web.py
 import web
+import re
 import config
 import base64
 
@@ -36,6 +37,7 @@ render = web.template.render('templates/', cache=config.cache)
 urls = (
     '/', 'index',
     '/api', 'api',
+    '/login', 'login',
 )
 
 # vsepp
@@ -68,7 +70,9 @@ opt.vocab_size = len(vocab)
 # opt.workers = 4
 
 web.debug("opt:", vars(opt))
+
 model = VSE(opt)
+
 # load model state
 model.load_state_dict(checkpoint['model'])
 
@@ -120,12 +124,12 @@ def _get_score(img, cap):
     web.debug("DEBUG d, inds: ", d, inds)
     return d[inds[0]]
 
-
-
 class index:
 
     def GET(self, *args):
-        return """<html><head></head><body>
+
+        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
+            return """<html><head></head><body>
 This form takes an image upload and caption description and returns cosine-similarity.<br/><br/>
 <form method="POST" enctype="multipart/form-data" action="">
 Image: <input type="file" name="img_file" /><br/><br/>
@@ -134,13 +138,15 @@ Caption: <input type="text" name="caption" />
 <input type="submit" />
 </form>
 </body></html>"""
+        else:
+            raise web.seeother('/login')
 
     def POST(self, *args):
         x = web.input(img_file={})
+        web.debug(x['caption'])        # This is the caption contents
         web.debug(x['img_file'].filename)    # This is the filename
         # web.debug(x['img_file'].value)       # This is the file contents
         # web.debug(x['img_file'].file.read()) # Or use a file(-like) object
-        web.debug(x['caption'])        # This is the caption contents
         # data = web.data()
     
         data_uri = base64.b64encode(x['img_file'].file.read())
@@ -158,18 +164,34 @@ Caption: <input type="text" name="caption" /><br/>
 </form>""" + img_tag + """<br/>Caption: """ + str(x['caption']) + """<br/>
 Score: """ + str(score) + """ 
 </body></html>"""
-        # raise web.seeother('/')
-        return page
+
+        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
+            return page
+        else:
+            raise web.seeother('/login')
 
 class api:
 
     def POST(self, *args):
         x = web.input(img_file={})
-        web.debug(x['img_file'].filename)    # This is the filename
+        web.debug(x['token'])                  # This is the api token 
+        web.debug(x['caption'])                # This is the caption contents
+        web.debug(x['img_file'].filename)      # This is the filename
         # web.debug(x['img_file'].value)       # This is the file contents
         # web.debug(x['img_file'].file.read()) # Or use a file(-like) object
-        web.debug(x['caption'])        # This is the caption contents
         # data = web.data()
+
+        if not x['caption']:
+            return "No caption."
+
+        if not x['img_file'].filename:
+            return "No file."
+
+        if not x['token']:
+            return "No token."
+
+        if not x['token'] in config.tokens:
+            return "Not in tokens."
     
         data_uri = base64.b64encode(x['img_file'].file.read())
         img_tag = '<img src="data:image/jpeg;base64,{0}">'.format(data_uri)
@@ -179,8 +201,25 @@ class api:
         return score
 
 
+class login:
 
-# <img src="data:image/jpeg;base64,{""" + x['img_file'].value + """}">
+    def GET(self):
+        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
+        authreq = False
+        if auth is None:
+            authreq = True
+        else:
+            auth = re.sub('^Basic ','',auth)
+            username,password = base64.decodestring(auth).split(':')
+            if (username,password) in config.allowed:
+                raise web.seeother('/')
+            else:
+                authreq = True
+        if authreq:
+            web.header('WWW-Authenticate','Basic realm="Auth example"')
+            web.ctx.status = '401 Unauthorized'
+            return
+
 
 if __name__ == "__main__":
     app = web.application(urls, globals())

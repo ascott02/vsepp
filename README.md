@@ -13,6 +13,11 @@ To get the code and install dependencies:
     pip install -r requirements_build.txt # installs cython and numpy
     pip install -r requirements.txt       # installs the rest
 
+Download the punkt dictionary
+
+    source ../code/venv/bin/activate
+    python -m nltk.downloader punkt
+
 To get the data and models (same as below):
 
     wget -v http://www.cs.toronto.edu/~faghri/vsepp/vocab.tar 
