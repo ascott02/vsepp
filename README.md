@@ -35,9 +35,9 @@ Extract those to somewhere you have a lot of space
 Symlink from your vsepp checkout dir to your unpacked dirs
 
     cd ~/code/vsepp # or wherever you had checked it out
-    ln -s /mnt/BIGSOACE/vsepp/vocab 
-    ln -s /mnt/BIGSOACE/vsepp/data
-    ln -s /mnt/BIGSOACE/vsepp/runs
+    ln -s /mnt/BIGSPACE/vsepp/vocab 
+    ln -s /mnt/BIGSPACE/vsepp/data
+    ln -s /mnt/BIGSPACE/vsepp/runs
 
 Run the test_eval.py script to test it out
   
