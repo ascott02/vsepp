@@ -2,7 +2,7 @@
 
 This is a fork of the [vsepp](https://github.com/fartashf/vsepp) project. Their original readme is below. This project extends that code, and adds a memory resident webservice using [web.py](https://webpy.org).
 
-Depends on Python 2.7, PyTorch==1.2.1, and tensorflow-gpu==1.15.0 for Cuda 10 .
+Depends on Python 2.7, PyTorch==1.4.0, and tensorflow-gpu==1.15.0 for Cuda 10 .
 
 To get the code and install dependencies:
 
