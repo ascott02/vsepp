@@ -76,6 +76,9 @@ model = VSE(opt)
 # load model state
 model.load_state_dict(checkpoint['model'])
 
+# don't forget to enable eval mode
+model.val_start()
+
 def _get_score(img, cap):
     transform = data.get_transform(data_name,split, opt)
     img_transform = transforms.Compose([
@@ -86,7 +89,9 @@ def _get_score(img, cap):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ]) 
+    # img = Image.open(base64.b64decode(io.BytesIO(img))).convert('RGB')
     img = Image.open(io.BytesIO(img)).convert('RGB')
+    # img = Image.open('../COCO_val2014_000000391895.jpg').convert('RGB')
     # img_tens = img_transform(img).unsqueeze(0)
     img_tens = transform(img).unsqueeze(0)
     # img_tens = transforms.ToTensor()(img)
