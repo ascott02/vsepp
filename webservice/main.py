@@ -29,6 +29,7 @@ from torch.autograd import Variable
 from torchvision import transforms
 from PIL import Image
 import io
+import requests
 
 # web.py
 render = web.template.render('templates/', cache=config.cache)
@@ -38,6 +39,7 @@ urls = (
     '/', 'index',
     '/api', 'api',
     '/login', 'login',
+    '/upload', 'upload',
 )
 
 # vsepp
@@ -80,27 +82,19 @@ model.load_state_dict(checkpoint['model'])
 model.val_start()
 
 def _get_score(img, cap):
-    transform = data.get_transform(data_name,split, opt)
-    img_transform = transforms.Compose([
-        transforms.RandomResizedCrop(opt.crop_size),
-        transforms.RandomHorizontalFlip(),
-        transforms.Resize(256), 
-        transforms.CenterCrop(224), 
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ]) 
-    # img = Image.open(base64.b64decode(io.BytesIO(img))).convert('RGB')
-    img = Image.open(io.BytesIO(img)).convert('RGB')
-    # img = Image.open('../COCO_val2014_000000391895.jpg').convert('RGB')
-    # img_tens = img_transform(img).unsqueeze(0)
+    transform = data.get_transform(data_name,split, opt)      
+    
+    if img.startswith('http'):
+        img = Image.open(requests.get(img, stream=True).raw)
+    else:
+        # path = image_path
+        img = Image.open(io.BytesIO(img)).convert('RGB')
+
     img_tens = transform(img).unsqueeze(0)
-    # img_tens = transforms.ToTensor()(img)
     if torch.cuda.is_available():
        img_tens = img_tens.cuda()
 
-    # img_emb = model.img_enc.forward(img_tens)
     img_emb = model.img_enc(img_tens)
-    # img_emb = img_emb.reshape(1, 1024)
     img_emb = img_emb.cuda().detach().cpu().clone().numpy()
     
     new_cap_tokens = nltk.tokenize.word_tokenize(str(cap).lower())
@@ -148,12 +142,8 @@ Caption: <input type="text" name="caption" />
 
     def POST(self, *args):
         x = web.input(img_file={})
-        web.debug(x['caption'])        # This is the caption contents
+        web.debug(x['caption'])              # This is the caption contents
         web.debug(x['img_file'].filename)    # This is the filename
-        # web.debug(x['img_file'].value)       # This is the file contents
-        # web.debug(x['img_file'].file.read()) # Or use a file(-like) object
-        # data = web.data()
-    
         data_uri = base64.b64encode(x['img_file'].file.read())
         img_tag = '<img src="data:image/jpeg;base64,{0}">'.format(data_uri)
 
@@ -175,7 +165,32 @@ Score: """ + str(score) + """
         else:
             raise web.seeother('/login')
 
+
 class api:
+
+    def POST(self, *args):
+        x = web.input(img_file={})
+        web.debug(x['token'])                  # This is the api token 
+        web.debug(x['caption'])                # This is the caption contents
+        web.debug(x['img_url'])              # This is the URL to the image
+
+        if not x['caption']:
+            return "No caption."
+
+        if not x['img_url']:
+            return "No file."
+
+        if not x['token']:
+            return "No token."
+
+        if not x['token'] in config.tokens:
+            return "Not in tokens."
+    
+        score = _get_score(str(x['img_url']), str(x['caption']))
+        return score
+
+
+class upload:
 
     def POST(self, *args):
         x = web.input(img_file={})
