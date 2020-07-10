@@ -85,7 +85,14 @@ def _get_score(img, cap):
     transform = data.get_transform(data_name,split, opt)      
     
     if img.startswith('http'):
-        img = Image.open(requests.get(img, stream=True).raw).convert('RGB')
+        path = requests.get(img, stream=True)
+        try:
+            print("DEBUG try")
+            img = Image.open(path).convert('RGB')
+        except:
+            print("DEBUG except")
+            stream = io.BytesIO(path.content)
+            img = Image.open(stream).convert('RGB')
     else:
         # path = image_path
         img = Image.open(io.BytesIO(img)).convert('RGB')
